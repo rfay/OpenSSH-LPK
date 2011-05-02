@@ -8,3 +8,6 @@ Here are some resources:
 * The [Fedora commit](http://pkgs.fedoraproject.org/gitweb/?p=openssh.git;a=tree;h=ad92f9c7485c5bf66520453ca00ffbd5a9997dbb;hb=7818e56d625e05b7b3a727cb8784e4adbece4bbb) with appropriate patches. Note that the fedora patch only fails in the makefile.
 * The [openssh-lpk CVS repo](http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/packages/openssh/openssh-lpk.patch) from cvs.pld-linux.org. 1.4 does not apply. 1.6 does not apply. However, this line seems promising.
 * Mandriva provides patches. They're here, extracted from the Mandriva SRPM. Also don't apply. I got the Mandriva SRPM from http://ftp.yandex.ru/mandriva/devel/2010.1/SRPMS/main/release/ Here's an [actual repository link](http://ftp.yandex.ru/mandriva/devel/2010.1/SRPMS/main/release/openssh-5.5p1-2mdv2010.1.src.rpm)
+
+
+WIN: The openssh-lpk-read-only patch contrib-openssh-lpk-5.4p1-0.3.13.patch can be edited by a single line in version.h to update the version, and this patch then applies. I have left that adjusted patch as openssh-lpk-read-only/patch/contrib/contrib-openssh-lpk-5.5p1-0.3.13.patch
