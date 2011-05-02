@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 28
+/svn/!svn/ver/27/trunk/patch
+END
+openssh-lpk-4.2p1-0.3.7.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/15/trunk/patch/openssh-lpk-4.2p1-0.3.7.patch
+END
+openssh-lpk-4.3p1-0.3.7.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/15/trunk/patch/openssh-lpk-4.3p1-0.3.7.patch
+END
+openssh-lpk-4.4p1-0.3.7.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/15/trunk/patch/openssh-lpk-4.4p1-0.3.7.patch
+END
+openssh-lpk-4.5p1-0.3.7.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/15/trunk/patch/openssh-lpk-4.5p1-0.3.7.patch
+END
+openssh-lpk-4.5p1-0.3.8.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/14/trunk/patch/openssh-lpk-4.5p1-0.3.8.patch
+END
+openssh-lpk-4.6p1-0.3.9.patch
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/14/trunk/patch/openssh-lpk-4.6p1-0.3.9.patch
+END

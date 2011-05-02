@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 30
+/svn/!svn/ver/15/trunk/schemas
+END
+openssh-lpk_openldap.schema
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/15/trunk/schemas/openssh-lpk_openldap.schema
+END
+openssh-lpk_sun.schema
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/15/trunk/schemas/openssh-lpk_sun.schema
+END

@@ -1,0 +1,151 @@
+diff -Nuar --exclude '*.orig' --exclude '*.rej' openssh-5.3p1+lpk/ldapauth.c openssh-5.3p1+lpk+pubkeyattr/ldapauth.c
+--- openssh-5.3p1+lpk/ldapauth.c	2009-11-02 14:33:42.000000000 +0100
++++ openssh-5.3p1+lpk+pubkeyattr/ldapauth.c	2009-11-02 14:41:29.000000000 +0100
+@@ -35,11 +35,6 @@
+ #include "ldapauth.h"
+ #include "log.h"
+ 
+-static char *attrs[] = {
+-    PUBKEYATTR,
+-    NULL
+-};
+-
+ /* filter building infos */
+ #define FILTER_GROUP_PREFIX "(&(objectclass=posixGroup)"
+ #define FILTER_OR_PREFIX "(|"
+@@ -373,6 +368,10 @@
+     LDAPMessage *res, *e;
+     char * filter;
+     int i;
++    char *attrs[] = {
++      l->pub_key_attr,
++      NULL
++    };
+ 
+     if ((!k) || (!l))
+          return NULL;
+@@ -424,7 +423,7 @@
+         debug("[LDAP] duplicate entries, using the FIRST entry returned");
+ 
+     e = ldap_first_entry(l->ld, res);
+-    k->keys = ldap_get_values_len(l->ld, e, PUBKEYATTR);
++    k->keys = ldap_get_values_len(l->ld, e, l->pub_key_attr);
+     k->num = ldap_count_values_len(k->keys);
+ 
+     ldap_msgfree(res);
+diff -Nuar --exclude '*.orig' --exclude '*.rej' openssh-5.3p1+lpk/ldapauth.h openssh-5.3p1+lpk+pubkeyattr/ldapauth.h
+--- openssh-5.3p1+lpk/ldapauth.h	2009-11-02 14:33:42.000000000 +0100
++++ openssh-5.3p1+lpk+pubkeyattr/ldapauth.h	2009-11-02 14:41:29.000000000 +0100
+@@ -47,6 +47,8 @@
+ #define _DEFAULT_STI_TOKEN "LpkSearchTimelimit"
+ #define _DEFAULT_LDP_TOKEN "LpkLdapConf"
+ 
++#define _DEFAULT_PUB_TOKEN "LpkPubKeyAttr"
++
+ /* default options */
+ #define _DEFAULT_LPK_ON 0
+ #define _DEFAULT_LPK_SERVERS NULL
+@@ -60,6 +62,7 @@
+ #define _DEFAULT_LPK_BTIMEOUT 10
+ #define _DEFAULT_LPK_STIMEOUT 10
+ #define _DEFAULT_LPK_LDP NULL
++#define _DEFAULT_LPK_PUB "sshPublicKey"
+ 
+ /* flags */
+ #define FLAG_EMPTY	    0x00000000
+@@ -73,7 +76,6 @@
+ /* defines */
+ #define FAILURE -1
+ #define SUCCESS 0
+-#define PUBKEYATTR "sshPublicKey"
+ 
+ /* 
+  *
+@@ -101,6 +103,7 @@
+     struct timeval b_timeout;   /* bind timeout */
+     struct timeval s_timeout;   /* search timeout */
+     unsigned int flags;		/* misc flags (reconnection, future use?) */
++    char * pub_key_attr;	/* Pubkey-Attribute */
+ } ldap_opt_t;
+ 
+ typedef struct ldap_keys {
+diff -Nuar --exclude '*.orig' --exclude '*.rej' openssh-5.3p1+lpk/servconf.c openssh-5.3p1+lpk+pubkeyattr/servconf.c
+--- openssh-5.3p1+lpk/servconf.c	2009-11-02 14:33:42.000000000 +0100
++++ openssh-5.3p1+lpk+pubkeyattr/servconf.c	2009-11-02 14:41:29.000000000 +0100
+@@ -149,8 +149,8 @@
+  	options->lpk.b_timeout.tv_sec = -1;
+  	options->lpk.s_timeout.tv_sec = -1;
+  	options->lpk.flags = FLAG_EMPTY;
++	options->lpk.pub_key_attr = NULL;
+ #endif
+-
+ }
+ 
+ void
+@@ -309,6 +309,8 @@
+ 	    options->lpk.s_timeout.tv_sec = _DEFAULT_LPK_STIMEOUT;
+ 	if (options->lpk.l_conf == NULL)
+ 	    options->lpk.l_conf = _DEFAULT_LPK_LDP;
++	if (options->lpk.pub_key_attr == NULL)
++	    options->lpk.pub_key_attr = _DEFAULT_LPK_PUB;
+ #endif
+ 
+ 	/* Turn privilege separation on by default */
+@@ -360,7 +362,7 @@
+ 	,sLdapPublickey, sLdapServers, sLdapUserDN
+ 	,sLdapGroupDN, sBindDN, sBindPw, sMyGroup
+ 	,sLdapFilter, sForceTLS, sBindTimeout
+-	,sSearchTimeout, sLdapConf
++	,sSearchTimeout, sLdapConf ,sLpkPubKeyAttr 
+ #endif
+ } ServerOpCodes;
+ 
+@@ -485,7 +487,9 @@
+ 	{ _DEFAULT_BTI_TOKEN, sBindTimeout, SSHCFG_GLOBAL },
+ 	{ _DEFAULT_STI_TOKEN, sSearchTimeout, SSHCFG_GLOBAL },
+ 	{ _DEFAULT_LDP_TOKEN, sLdapConf, SSHCFG_GLOBAL },
++	{ "LpkPubKeyAttr", sLpkPubKeyAttr, SSHCFG_GLOBAL },
+ #endif
++
+ 	{ "useprivilegeseparation", sUsePrivilegeSeparation, SSHCFG_GLOBAL},
+ 	{ "acceptenv", sAcceptEnv, SSHCFG_GLOBAL },
+ 	{ "permittunnel", sPermitTunnel, SSHCFG_GLOBAL },
+@@ -1476,6 +1480,15 @@
+ 		options->lpk.l_conf = xstrdup(arg);
+ 		memset(arg, 0, strlen(arg));
+ 		break;
++	case sLpkPubKeyAttr:
++		arg = cp;
++                if (!arg || *arg == '\0')
++                    fatal("%s line %d: missing pubkeyattr",filename,linenum);
++                arg[strlen(arg)] = '\0';
++                options->lpk.pub_key_attr = xstrdup(arg);
++                memset(arg,0,strlen(arg));
++                break;
++
+ #endif
+ 
+ 	default:
+diff -Nuar --exclude '*.orig' --exclude '*.rej' openssh-5.3p1+lpk/sshd_config openssh-5.3p1+lpk+pubkeyattr/sshd_config
+--- openssh-5.3p1+lpk/sshd_config	2009-11-02 14:33:42.000000000 +0100
++++ openssh-5.3p1+lpk+pubkeyattr/sshd_config	2009-11-02 14:41:29.000000000 +0100
+@@ -123,6 +123,7 @@
+ #LpkForceTLS no
+ #LpkSearchTimelimit 3
+ #LpkBindTimelimit 3
++#LpkPubKeyAttr sshPublicKey
+ 
+ # override default of no subsystems
+ Subsystem	sftp	/usr/libexec/sftp-server
+diff -Nuar --exclude '*.orig' --exclude '*.rej' openssh-5.3p1+lpk/version.h openssh-5.3p1+lpk+pubkeyattr/version.h
+--- openssh-5.3p1+lpk/version.h	2009-11-02 14:42:43.000000000 +0100
++++ openssh-5.3p1+lpk+pubkeyattr/version.h	2009-11-02 14:43:22.000000000 +0100
+@@ -1,6 +1,6 @@
+ /* $OpenBSD: version.h,v 1.56 2009/06/30 14:54:40 markus Exp $ */
+ 
+ #define SSH_VERSION	"OpenSSH_5.3"
+-
++#define SSH_LPK		"lpk"
+ #define SSH_PORTABLE	"p1"
+-#define SSH_RELEASE	SSH_VERSION SSH_PORTABLE
++#define SSH_RELEASE	SSH_VERSION SSH_PORTABLE SSH_LPK
