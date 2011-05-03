@@ -1,0 +1,3 @@
+[submodule "fedora_openssh"]
+	path = fedora_openssh
+	url = git://pkgs.fedoraproject.org/openssh.git
