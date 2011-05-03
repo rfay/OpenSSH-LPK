@@ -11,3 +11,24 @@ Here are some resources:
 
 
 WIN: The openssh-lpk-read-only patch contrib-openssh-lpk-5.4p1-0.3.13.patch can be edited by a single line in version.h to update the version, and this patch then applies. I have left that adjusted patch as openssh-lpk-read-only/patch/contrib/contrib-openssh-lpk-5.5p1-0.3.13.patch
+
+
+UPDATE: 
+apt-get source openssh
+cd openssh-5.5p1
+dquilt pop -a  # so that we can apply the LPK patch first
+dquilt import contrib-openssh-lpk-5.5p1-0.3.13.patch  # from above
+dquilt push
+dquilt refresh
+dquilt header -e
+
+while dquilt push
+do
+  dquilt refresh
+done
+
+This patch applies, and everything ends up in the man pages, for example, but when you uncomment the LPK configuration in the /etc/ssh/sshd_config, it complains:
+
+/etc/ssh/sshd_config: line 49: Bad configuration option: UseLPK
+/etc/ssh/sshd_config: line 50: Bad configuration option: LpkLdapConf
+/etc/ssh/sshd_config: terminating, 2 bad configuration options
