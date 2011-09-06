@@ -14,6 +14,7 @@ WIN: The openssh-lpk-read-only patch contrib-openssh-lpk-5.4p1-0.3.13.patch can 
 
 
 UPDATE: 
+
     apt-get source openssh
     cd openssh-5.5p1
     dquilt pop -a  # so that we can apply the LPK patch first
