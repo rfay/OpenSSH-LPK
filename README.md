@@ -1,3 +1,5 @@
+OpenSSH-LPK works with Debian Squeeze!
+
 This repo gathers together the resources for OpenSSH 5.5p1 OpenSSH LPK
 build for Debian Squeeze package.
 
