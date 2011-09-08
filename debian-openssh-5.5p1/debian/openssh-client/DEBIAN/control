@@ -1,0 +1,37 @@
+Package: openssh-client
+Source: openssh
+Version: 1:5.5p1-6cg1
+Architecture: amd64
+Maintainer: Debian OpenSSH Maintainers <debian-ssh@lists.debian.org>
+Installed-Size: 2204
+Depends: libc6 (>= 2.11), libedit2 (>= 2.11-20080614-1), libgssapi-krb5-2 (>= 1.7+dfsg), libldap-2.4-2 (>= 2.4.7), libssl0.9.8 (>= 0.9.8m-1), zlib1g (>= 1:1.1.4), debconf (>= 1.2.0) | debconf-2.0, adduser (>= 3.10), dpkg (>= 1.7.0), passwd
+Recommends: xauth, openssh-blacklist, openssh-blacklist-extra
+Suggests: ssh-askpass, libpam-ssh, keychain
+Conflicts: rsh-client (<< 0.16.1-1), sftp, ssh (<< 1:3.8.1p1-9), ssh-krb5 (<< 1:4.3p2-7)
+Replaces: ssh, ssh-krb5
+Provides: rsh-client, ssh-client
+Section: net
+Priority: standard
+Homepage: http://www.openssh.org/
+Description: secure shell (SSH) client, for secure access to remote machines
+ This is the portable version of OpenSSH, a free implementation of
+ the Secure Shell protocol as specified by the IETF secsh working
+ group.
+ .
+ Ssh (Secure Shell) is a program for logging into a remote machine
+ and for executing commands on a remote machine.
+ It provides secure encrypted communications between two untrusted
+ hosts over an insecure network. X11 connections and arbitrary TCP/IP
+ ports can also be forwarded over the secure channel.
+ It can be used to provide applications with a secure communication
+ channel.
+ .
+ This package provides the ssh, scp and sftp clients, the ssh-agent
+ and ssh-add programs to make public key authentication more convenient,
+ and the ssh-keygen, ssh-keyscan, ssh-copy-id and ssh-argv0 utilities.
+ .
+ In some countries it may be illegal to use any encryption at all
+ without a special permit.
+ .
+ ssh replaces the insecure rsh, rcp and rlogin programs, which are
+ obsolete for most purposes.

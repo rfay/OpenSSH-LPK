@@ -6,8 +6,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1494
 Bug-Debian: http://bugs.debian.org/492728
 Last-Update: 2010-02-27
 
-Index: b/sshconnect.c
-===================================================================
 --- a/sshconnect.c
 +++ b/sshconnect.c
 @@ -141,7 +141,7 @@

@@ -7,11 +7,9 @@ Author: Colin Watson <cjwatson@debian.org>
 Forwarded: yes
 Last-Updated: 2010-02-27
 
-Index: b/servconf.c
-===================================================================
 --- a/servconf.c
 +++ b/servconf.c
-@@ -1677,7 +1677,10 @@
+@@ -1872,7 +1872,10 @@
  #endif
  #ifdef GSSAPI
  	dump_cfg_fmtint(sGssAuthentication, o->gss_authentication);

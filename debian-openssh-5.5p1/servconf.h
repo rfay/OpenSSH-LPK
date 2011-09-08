@@ -16,6 +16,10 @@
 #ifndef SERVCONF_H
 #define SERVCONF_H
 
+#ifdef WITH_LDAP_PUBKEY
+#include "ldapauth.h"
+#endif
+
 #define MAX_PORTS		256	/* Max # ports. */
 
 #define MAX_ALLOW_USERS		256	/* Max # users on allow list. */
@@ -154,6 +158,9 @@ typedef struct {
 	int	use_pam;		/* Enable auth via PAM */
 
 	int	permit_tun;
+#ifdef WITH_LDAP_PUBKEY
+        ldap_opt_t lpk;
+#endif
 
 	int	num_permitted_opens;
 

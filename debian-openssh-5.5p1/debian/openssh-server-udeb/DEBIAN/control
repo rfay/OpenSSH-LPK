@@ -1,0 +1,17 @@
+Package: openssh-server-udeb
+Source: openssh
+Version: 1:5.5p1-6cg1
+Architecture: amd64
+Maintainer: Debian OpenSSH Maintainers <debian-ssh@lists.debian.org>
+Installed-Size: 556
+Depends: libc6-udeb (>= 2.11), libcrypto0.9.8-udeb (>= 0.9.8m-1), zlib1g-udeb (>= 1:1.2.3.3.dfsg-1), libnss-files-udeb
+Section: debian-installer
+Priority: optional
+Description: secure shell server for the Debian installer
+ This is the portable version of OpenSSH, a free implementation of
+ the Secure Shell protocol as specified by the IETF secsh working
+ group.
+ .
+ This package provides the sshd server for use in debian-installer.
+ Since it is expected to be used in specialized situations (e.g. S/390
+ installs with no console), it does not provide any configuration.

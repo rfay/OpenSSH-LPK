@@ -20,8 +20,6 @@ Author: Russ Allbery <rra@debian.org>
 Forwarded: not-needed
 Last-Update: 2010-02-28
 
-Index: b/readconf.c
-===================================================================
 --- a/readconf.c
 +++ b/readconf.c
 @@ -1132,7 +1132,7 @@
@@ -33,8 +31,6 @@ Index: b/readconf.c
  	if (options->exit_on_forward_failure == -1)
  		options->exit_on_forward_failure = 0;
  	if (options->xauth_location == NULL)
-Index: b/ssh_config
-===================================================================
 --- a/ssh_config
 +++ b/ssh_config
 @@ -17,9 +17,10 @@
@@ -57,8 +53,6 @@ Index: b/ssh_config
 +    HashKnownHosts yes
 +    GSSAPIAuthentication yes
 +    GSSAPIDelegateCredentials no
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -72,6 +72,22 @@
@@ -94,8 +88,6 @@ Index: b/ssh_config.5
  .Pp
  See the X11 SECURITY extension specification for full details on
  the restrictions imposed on untrusted clients.
-Index: b/sshd_config
-===================================================================
 --- a/sshd_config
 +++ b/sshd_config
 @@ -36,6 +36,7 @@
@@ -106,8 +98,6 @@ Index: b/sshd_config
  #PermitRootLogin yes
  #StrictModes yes
  #MaxAuthTries 6
-Index: b/sshd_config.5
-===================================================================
 --- a/sshd_config.5
 +++ b/sshd_config.5
 @@ -58,6 +58,33 @@

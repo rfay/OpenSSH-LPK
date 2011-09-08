@@ -1,0 +1,15 @@
+Package: ssh-krb5
+Source: openssh
+Version: 1:5.5p1-6cg1
+Architecture: all
+Maintainer: Debian OpenSSH Maintainers <debian-ssh@lists.debian.org>
+Installed-Size: 140
+Depends: openssh-client, openssh-server
+Section: net
+Priority: extra
+Homepage: http://www.openssh.org/
+Description: secure shell client and server (transitional package)
+ This is a transitional package depending on the regular Debian OpenSSH
+ client and server, which now support GSSAPI natively. It will add the
+ necessary GSSAPI options to the server configuration file. You can
+ remove it once the upgrade is complete and nothing depends on it.

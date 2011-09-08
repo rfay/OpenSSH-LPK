@@ -15,8 +15,6 @@ Author: Simon Wilkinson <simon@sxw.org.uk>
 Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1242
 Last-Updated: 2010-02-27
 
-Index: b/ChangeLog.gssapi
-===================================================================
 --- /dev/null
 +++ b/ChangeLog.gssapi
 @@ -0,0 +1,103 @@
@@ -123,8 +121,6 @@ Index: b/ChangeLog.gssapi
 +    add support for GssapiTrustDns option for gssapi-with-mic
 +    (from jbasney AT ncsa.uiuc.edu)
 +    <gssapi-with-mic support is Bugzilla #1008>
-Index: b/Makefile.in
-===================================================================
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -74,7 +74,7 @@
@@ -144,9 +140,7 @@ Index: b/Makefile.in
 +	auth2-gss.o gss-serv.o gss-serv-krb5.o kexgsss.o\
  	loginrec.o auth-pam.o auth-shadow.o auth-sia.o md5crypt.o \
  	audit.o audit-bsm.o platform.o sftp-server.o sftp-common.o \
- 	roaming_common.o roaming_serv.o
-Index: b/auth-krb5.c
-===================================================================
+ 	roaming_common.o roaming_serv.o ldapauth.o
 --- a/auth-krb5.c
 +++ b/auth-krb5.c
 @@ -170,8 +170,13 @@
@@ -196,8 +190,6 @@ Index: b/auth-krb5.c
  
  	return (krb5_cc_resolve(ctx, ccname, ccache));
  }
-Index: b/auth.h
-===================================================================
 --- a/auth.h
 +++ b/auth.h
 @@ -53,6 +53,7 @@
@@ -208,8 +200,6 @@ Index: b/auth.h
  	int		 force_pwchange;
  	char		*user;		/* username sent by the client */
  	char		*service;
-Index: b/auth2-gss.c
-===================================================================
 --- a/auth2-gss.c
 +++ b/auth2-gss.c
 @@ -1,7 +1,7 @@
@@ -311,8 +301,6 @@ Index: b/auth2-gss.c
  Authmethod method_gssapi = {
  	"gssapi-with-mic",
  	userauth_gssapi,
-Index: b/auth2.c
-===================================================================
 --- a/auth2.c
 +++ b/auth2.c
 @@ -69,6 +69,7 @@
@@ -349,8 +337,6 @@ Index: b/auth2.c
  			authctxt->failures++;
  		if (authctxt->failures >= options.max_authtries) {
  #ifdef SSH_AUDIT_EVENTS
-Index: b/clientloop.c
-===================================================================
 --- a/clientloop.c
 +++ b/clientloop.c
 @@ -111,6 +111,10 @@
@@ -380,8 +366,6 @@ Index: b/clientloop.c
  			if (need_rekeying || packet_need_rekeying()) {
  				debug("need rekeying");
  				xxx_kex->done = 0;
-Index: b/configure.ac
-===================================================================
 --- a/configure.ac
 +++ b/configure.ac
 @@ -477,6 +477,30 @@
@@ -415,8 +399,6 @@ Index: b/configure.ac
  	m4_pattern_allow(AU_IPv)
  	AC_CHECK_DECL(AU_IPv4, [], 
  	    AC_DEFINE(AU_IPv4, 0, [System only supports IPv4 audit records])
-Index: b/gss-genr.c
-===================================================================
 --- a/gss-genr.c
 +++ b/gss-genr.c
 @@ -1,7 +1,7 @@
@@ -766,8 +748,6 @@ Index: b/gss-genr.c
 +}
 +
  #endif /* GSSAPI */
-Index: b/gss-serv-krb5.c
-===================================================================
 --- a/gss-serv-krb5.c
 +++ b/gss-serv-krb5.c
 @@ -1,7 +1,7 @@
@@ -890,8 +870,6 @@ Index: b/gss-serv-krb5.c
  };
  
  #endif /* KRB5 */
-Index: b/gss-serv.c
-===================================================================
 --- a/gss-serv.c
 +++ b/gss-serv.c
 @@ -1,7 +1,7 @@
@@ -1207,8 +1185,6 @@ Index: b/gss-serv.c
  }
  
  #endif
-Index: b/kex.c
-===================================================================
 --- a/kex.c
 +++ b/kex.c
 @@ -50,6 +50,10 @@
@@ -1243,8 +1219,6 @@ Index: b/kex.c
  	} else
  		fatal("bad kex alg %s", k->name);
  }
-Index: b/kex.h
-===================================================================
 --- a/kex.h
 +++ b/kex.h
 @@ -67,6 +67,9 @@
@@ -1282,8 +1256,6 @@ Index: b/kex.h
  void
  kex_dh_hash(char *, char *, char *, int, char *, int, u_char *, int,
      BIGNUM *, BIGNUM *, BIGNUM *, u_char **, u_int *);
-Index: b/kexgssc.c
-===================================================================
 --- /dev/null
 +++ b/kexgssc.c
 @@ -0,0 +1,334 @@
@@ -1621,8 +1593,6 @@ Index: b/kexgssc.c
 +}
 +
 +#endif /* GSSAPI */
-Index: b/kexgsss.c
-===================================================================
 --- /dev/null
 +++ b/kexgsss.c
 @@ -0,0 +1,288 @@
@@ -1914,8 +1884,6 @@ Index: b/kexgsss.c
 +		ssh_gssapi_rekey_creds();
 +}
 +#endif /* GSSAPI */
-Index: b/key.c
-===================================================================
 --- a/key.c
 +++ b/key.c
 @@ -982,6 +982,8 @@
@@ -1927,8 +1895,6 @@ Index: b/key.c
  	}
  	debug2("key_type_from_name: unknown key type '%s'", name);
  	return KEY_UNSPEC;
-Index: b/key.h
-===================================================================
 --- a/key.h
 +++ b/key.h
 @@ -37,6 +37,7 @@
@@ -1939,8 +1905,6 @@ Index: b/key.h
  	KEY_UNSPEC
  };
  enum fp_type {
-Index: b/monitor.c
-===================================================================
 --- a/monitor.c
 +++ b/monitor.c
 @@ -172,6 +172,8 @@
@@ -2135,8 +2099,6 @@ Index: b/monitor.c
  #endif /* GSSAPI */
  
  #ifdef JPAKE
-Index: b/monitor.h
-===================================================================
 --- a/monitor.h
 +++ b/monitor.h
 @@ -53,6 +53,8 @@
@@ -2148,8 +2110,6 @@ Index: b/monitor.h
  	MONITOR_REQ_PAM_START,
  	MONITOR_REQ_PAM_ACCOUNT, MONITOR_ANS_PAM_ACCOUNT,
  	MONITOR_REQ_PAM_INIT_CTX, MONITOR_ANS_PAM_INIT_CTX,
-Index: b/monitor_wrap.c
-===================================================================
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
 @@ -1231,7 +1231,7 @@
@@ -2213,8 +2173,6 @@ Index: b/monitor_wrap.c
  #endif /* GSSAPI */
  
  #ifdef JPAKE
-Index: b/monitor_wrap.h
-===================================================================
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
 @@ -57,8 +57,10 @@
@@ -2229,8 +2187,6 @@ Index: b/monitor_wrap.h
  #endif
  
  #ifdef USE_PAM
-Index: b/readconf.c
-===================================================================
 --- a/readconf.c
 +++ b/readconf.c
 @@ -127,6 +127,7 @@
@@ -2314,8 +2270,6 @@ Index: b/readconf.c
  	if (options->password_authentication == -1)
  		options->password_authentication = 1;
  	if (options->kbd_interactive_authentication == -1)
-Index: b/readconf.h
-===================================================================
 --- a/readconf.h
 +++ b/readconf.h
 @@ -44,7 +44,11 @@
@@ -2330,11 +2284,9 @@ Index: b/readconf.h
  	int     password_authentication;	/* Try password
  						 * authentication. */
  	int     kbd_interactive_authentication; /* Try keyboard-interactive auth. */
-Index: b/servconf.c
-===================================================================
 --- a/servconf.c
 +++ b/servconf.c
-@@ -93,7 +93,10 @@
+@@ -97,7 +97,10 @@
  	options->kerberos_ticket_cleanup = -1;
  	options->kerberos_get_afs_token = -1;
  	options->gss_authentication=-1;
@@ -2345,7 +2297,7 @@ Index: b/servconf.c
  	options->password_authentication = -1;
  	options->kbd_interactive_authentication = -1;
  	options->challenge_response_authentication = -1;
-@@ -214,8 +217,14 @@
+@@ -237,8 +240,14 @@
  		options->kerberos_get_afs_token = 0;
  	if (options->gss_authentication == -1)
  		options->gss_authentication = 0;
@@ -2360,7 +2312,7 @@ Index: b/servconf.c
  	if (options->password_authentication == -1)
  		options->password_authentication = 1;
  	if (options->kbd_interactive_authentication == -1)
-@@ -306,7 +315,9 @@
+@@ -358,7 +367,9 @@
  	sBanner, sUseDNS, sHostbasedAuthentication,
  	sHostbasedUsesNameFromPacketOnly, sClientAliveInterval,
  	sClientAliveCountMax, sAuthorizedKeysFile, sAuthorizedKeysFile2,
@@ -2371,7 +2323,7 @@ Index: b/servconf.c
  	sMatch, sPermitOpen, sForceCommand, sChrootDirectory,
  	sUsePrivilegeSeparation, sAllowAgentForwarding,
  	sZeroKnowledgePasswordAuthentication, sHostCertificate,
-@@ -369,9 +380,15 @@
+@@ -427,9 +438,15 @@
  #ifdef GSSAPI
  	{ "gssapiauthentication", sGssAuthentication, SSHCFG_ALL },
  	{ "gssapicleanupcredentials", sGssCleanupCreds, SSHCFG_GLOBAL },
@@ -2387,7 +2339,7 @@ Index: b/servconf.c
  #endif
  	{ "passwordauthentication", sPasswordAuthentication, SSHCFG_ALL },
  	{ "kbdinteractiveauthentication", sKbdInteractiveAuthentication, SSHCFG_ALL },
-@@ -924,10 +941,22 @@
+@@ -1000,10 +1017,22 @@
  		intptr = &options->gss_authentication;
  		goto parse_flag;
  
@@ -2410,11 +2362,9 @@ Index: b/servconf.c
  	case sPasswordAuthentication:
  		intptr = &options->password_authentication;
  		goto parse_flag;
-Index: b/servconf.h
-===================================================================
 --- a/servconf.h
 +++ b/servconf.h
-@@ -94,7 +94,10 @@
+@@ -98,7 +98,10 @@
  	int     kerberos_get_afs_token;		/* If true, try to get AFS token if
  						 * authenticated with Kerberos. */
  	int     gss_authentication;	/* If true, permit GSSAPI authentication */
@@ -2425,8 +2375,6 @@ Index: b/servconf.h
  	int     password_authentication;	/* If true, permit password
  						 * authentication. */
  	int     kbd_interactive_authentication;	/* If true, permit */
-Index: b/ssh-gss.h
-===================================================================
 --- a/ssh-gss.h
 +++ b/ssh-gss.h
 @@ -1,6 +1,6 @@
@@ -2526,8 +2474,6 @@ Index: b/ssh-gss.h
  #endif /* GSSAPI */
  
  #endif /* _SSH_GSS_H */
-Index: b/ssh_config
-===================================================================
 --- a/ssh_config
 +++ b/ssh_config
 @@ -26,6 +26,8 @@
@@ -2539,8 +2485,6 @@ Index: b/ssh_config
  #   BatchMode no
  #   CheckHostIP yes
  #   AddressFamily any
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -478,11 +478,38 @@
@@ -2583,8 +2527,6 @@ Index: b/ssh_config.5
  .It Cm HashKnownHosts
  Indicates that
  .Xr ssh 1
-Index: b/sshconnect2.c
-===================================================================
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
 @@ -106,9 +106,34 @@
@@ -2779,8 +2721,6 @@ Index: b/sshconnect2.c
  #endif /* GSSAPI */
  
  int
-Index: b/sshd.c
-===================================================================
 --- a/sshd.c
 +++ b/sshd.c
 @@ -120,6 +120,10 @@
@@ -2794,7 +2734,7 @@ Index: b/sshd.c
  #ifdef LIBWRAP
  #include <tcpd.h>
  #include <syslog.h>
-@@ -1577,10 +1581,13 @@
+@@ -1591,10 +1595,13 @@
  		logit("Disabling protocol version 1. Could not load host key");
  		options.protocol &= ~SSH_PROTO_1;
  	}
@@ -2808,7 +2748,7 @@ Index: b/sshd.c
  	if (!(options.protocol & (SSH_PROTO_1|SSH_PROTO_2))) {
  		logit("sshd: no hostkeys available -- exiting.");
  		exit(1);
-@@ -1909,6 +1916,60 @@
+@@ -1923,6 +1930,60 @@
  	/* Log the connection. */
  	verbose("Connection from %.500s port %d", remote_ip, remote_port);
  
@@ -2869,7 +2809,7 @@ Index: b/sshd.c
  	/*
  	 * We don't want to listen forever unless the other side
  	 * successfully authenticates itself.  So we set up an alarm which is
-@@ -2287,12 +2348,61 @@
+@@ -2301,12 +2362,61 @@
  
  	myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] = list_hostkey_types();
  
@@ -2931,8 +2871,6 @@ Index: b/sshd.c
  	kex->server = 1;
  	kex->client_version_string=client_version_string;
  	kex->server_version_string=server_version_string;
-Index: b/sshd_config
-===================================================================
 --- a/sshd_config
 +++ b/sshd_config
 @@ -71,6 +71,8 @@
@@ -2944,8 +2882,6 @@ Index: b/sshd_config
  
  # Set this to 'yes' to enable PAM authentication, account processing, 
  # and session processing. If this is enabled, PAM authentication will 
-Index: b/sshd_config.5
-===================================================================
 --- a/sshd_config.5
 +++ b/sshd_config.5
 @@ -379,12 +379,40 @@

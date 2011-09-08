@@ -3,8 +3,6 @@ Author: Matthew Vernon <matthew@debian.org>
 Bug-Debian: http://bugs.debian.org/50308
 Last-Update: 2010-02-27
 
-Index: b/serverloop.c
-===================================================================
 --- a/serverloop.c
 +++ b/serverloop.c
 @@ -680,7 +680,7 @@

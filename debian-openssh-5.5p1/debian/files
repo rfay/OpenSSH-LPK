@@ -1,0 +1,7 @@
+openssh-client_5.5p1-6cg1_amd64.deb net standard
+openssh-server_5.5p1-6cg1_amd64.deb net optional
+ssh_5.5p1-6cg1_all.deb net extra
+ssh-krb5_5.5p1-6cg1_all.deb net extra
+ssh-askpass-gnome_5.5p1-6cg1_amd64.deb gnome optional
+openssh-client-udeb_5.5p1-6cg1_amd64.udeb debian-installer optional
+openssh-server-udeb_5.5p1-6cg1_amd64.udeb debian-installer optional

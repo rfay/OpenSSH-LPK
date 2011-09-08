@@ -1,0 +1,2 @@
+shlibs:Depends=libc6-udeb (>= 2.11), libcrypto0.9.8-udeb (>= 0.9.8m-1), zlib1g-udeb (>= 1:1.2.3.3.dfsg-1)
+misc:Depends=

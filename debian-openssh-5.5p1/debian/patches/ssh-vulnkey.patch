@@ -10,8 +10,6 @@ Author: Colin Watson <cjwatson@ubuntu.com>
 Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1469
 Last-Update: 2010-02-27
 
-Index: b/Makefile.in
-===================================================================
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -27,6 +27,7 @@
@@ -43,7 +41,7 @@ Index: b/Makefile.in
  	canohost.o channels.o cipher.o cipher-acss.o cipher-aes.o \
 @@ -93,8 +95,8 @@
  	audit.o audit-bsm.o platform.o sftp-server.o sftp-common.o \
- 	roaming_common.o roaming_serv.o
+ 	roaming_common.o roaming_serv.o ldapauth.o
  
 -MANPAGES	= moduli.5.out scp.1.out ssh-add.1.out ssh-agent.1.out ssh-keygen.1.out ssh-keyscan.1.out ssh.1.out sshd.8.out sftp-server.8.out sftp.1.out ssh-rand-helper.8.out ssh-keysign.8.out ssh-pkcs11-helper.8.out sshd_config.5.out ssh_config.5.out
 -MANPAGES_IN	= moduli.5 scp.1 ssh-add.1 ssh-agent.1 ssh-keygen.1 ssh-keyscan.1 ssh.1 sshd.8 sftp-server.8 sftp.1 ssh-rand-helper.8 ssh-keysign.8 ssh-pkcs11-helper.8 sshd_config.5 ssh_config.5
@@ -94,8 +92,6 @@ Index: b/Makefile.in
  	-rm -f $(DESTDIR)$(mandir)/$(mansubdir)8/sshd.8
  	-rm -f $(DESTDIR)$(mandir)/$(mansubdir)8/ssh-rand-helper.8
  	-rm -f $(DESTDIR)$(mandir)/$(mansubdir)8/sftp-server.8
-Index: b/auth-rh-rsa.c
-===================================================================
 --- a/auth-rh-rsa.c
 +++ b/auth-rh-rsa.c
 @@ -44,7 +44,7 @@
@@ -107,8 +103,6 @@ Index: b/auth-rh-rsa.c
  		return 0;
  
  	/* Check if we would accept it using rhosts authentication. */
-Index: b/auth-rsa.c
-===================================================================
 --- a/auth-rsa.c
 +++ b/auth-rsa.c
 @@ -94,7 +94,7 @@
@@ -120,8 +114,6 @@ Index: b/auth-rsa.c
  		return 0;
  
  	/* don't allow short keys */
-Index: b/auth.c
-===================================================================
 --- a/auth.c
 +++ b/auth.c
 @@ -59,6 +59,7 @@
@@ -168,8 +160,6 @@ Index: b/auth.c
  	if (options.revoked_keys_file == NULL)
  		return 0;
  
-Index: b/auth.h
-===================================================================
 --- a/auth.h
 +++ b/auth.h
 @@ -173,7 +173,7 @@
@@ -181,8 +171,6 @@ Index: b/auth.h
  
  HostStatus
  check_key_in_hostfiles(struct passwd *, Key *, const char *,
-Index: b/auth2-hostbased.c
-===================================================================
 --- a/auth2-hostbased.c
 +++ b/auth2-hostbased.c
 @@ -145,7 +145,7 @@
@@ -194,11 +182,9 @@ Index: b/auth2-hostbased.c
  		return 0;
  
  	resolvedname = get_canonical_hostname(options.use_dns);
-Index: b/auth2-pubkey.c
-===================================================================
 --- a/auth2-pubkey.c
 +++ b/auth2-pubkey.c
-@@ -328,9 +328,10 @@
+@@ -401,9 +401,10 @@
  	int success;
  	char *file;
  
@@ -211,8 +197,6 @@ Index: b/auth2-pubkey.c
  		return 0;
  
  	success = user_cert_trusted_ca(pw, key);
-Index: b/authfile.c
-===================================================================
 --- a/authfile.c
 +++ b/authfile.c
 @@ -68,6 +68,7 @@
@@ -364,8 +348,6 @@ Index: b/authfile.c
 +	return ret;
 +}
 +
-Index: b/authfile.h
-===================================================================
 --- a/authfile.h
 +++ b/authfile.h
 @@ -24,4 +24,6 @@
@@ -375,8 +357,6 @@ Index: b/authfile.h
 +int	 blacklisted_key(const Key *key, char **fp);
 +
  #endif
-Index: b/pathnames.h
-===================================================================
 --- a/pathnames.h
 +++ b/pathnames.h
 @@ -18,6 +18,10 @@
@@ -400,8 +380,6 @@ Index: b/pathnames.h
  #ifndef _PATH_SSH_PROGRAM
  #define _PATH_SSH_PROGRAM		"/usr/bin/ssh"
  #endif
-Index: b/readconf.c
-===================================================================
 --- a/readconf.c
 +++ b/readconf.c
 @@ -123,6 +123,7 @@
@@ -448,8 +426,6 @@ Index: b/readconf.c
  	if (options->batch_mode == -1)
  		options->batch_mode = 0;
  	if (options->check_host_ip == -1)
-Index: b/readconf.h
-===================================================================
 --- a/readconf.h
 +++ b/readconf.h
 @@ -54,6 +54,7 @@
@@ -460,11 +436,9 @@ Index: b/readconf.h
  	int     batch_mode;	/* Batch mode: do not ask for passwords. */
  	int     check_host_ip;	/* Also keep track of keys for IP address */
  	int     strict_host_key_checking;	/* Strict host key checking. */
-Index: b/servconf.c
-===================================================================
 --- a/servconf.c
 +++ b/servconf.c
-@@ -100,6 +100,7 @@
+@@ -104,6 +104,7 @@
  	options->password_authentication = -1;
  	options->kbd_interactive_authentication = -1;
  	options->challenge_response_authentication = -1;
@@ -472,7 +446,7 @@ Index: b/servconf.c
  	options->permit_empty_passwd = -1;
  	options->permit_user_env = -1;
  	options->use_login = -1;
-@@ -231,6 +232,8 @@
+@@ -254,6 +255,8 @@
  		options->kbd_interactive_authentication = 0;
  	if (options->challenge_response_authentication == -1)
  		options->challenge_response_authentication = 1;
@@ -481,7 +455,7 @@ Index: b/servconf.c
  	if (options->permit_empty_passwd == -1)
  		options->permit_empty_passwd = 0;
  	if (options->permit_user_env == -1)
-@@ -306,7 +309,7 @@
+@@ -358,7 +361,7 @@
  	sListenAddress, sAddressFamily,
  	sPrintMotd, sPrintLastLog, sIgnoreRhosts,
  	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
@@ -490,7 +464,7 @@ Index: b/servconf.c
  	sPermitUserEnvironment, sUseLogin, sAllowTcpForwarding, sCompression,
  	sAllowUsers, sDenyUsers, sAllowGroups, sDenyGroups,
  	sIgnoreUserKnownHosts, sCiphers, sMacs, sProtocol, sPidFile,
-@@ -415,6 +418,7 @@
+@@ -473,6 +476,7 @@
  	{ "x11uselocalhost", sX11UseLocalhost, SSHCFG_ALL },
  	{ "xauthlocation", sXAuthLocation, SSHCFG_GLOBAL },
  	{ "strictmodes", sStrictModes, SSHCFG_GLOBAL },
@@ -498,7 +472,7 @@ Index: b/servconf.c
  	{ "permitemptypasswords", sEmptyPasswd, SSHCFG_ALL },
  	{ "permituserenvironment", sPermitUserEnvironment, SSHCFG_GLOBAL },
  	{ "uselogin", sUseLogin, SSHCFG_GLOBAL },
-@@ -1009,6 +1013,10 @@
+@@ -1085,6 +1089,10 @@
  		intptr = &options->tcp_keep_alive;
  		goto parse_flag;
  
@@ -509,7 +483,7 @@ Index: b/servconf.c
  	case sEmptyPasswd:
  		intptr = &options->permit_empty_passwd;
  		goto parse_flag;
-@@ -1697,6 +1705,7 @@
+@@ -1892,6 +1900,7 @@
  	dump_cfg_fmtint(sX11UseLocalhost, o->x11_use_localhost);
  	dump_cfg_fmtint(sStrictModes, o->strict_modes);
  	dump_cfg_fmtint(sTCPKeepAlive, o->tcp_keep_alive);
@@ -517,11 +491,9 @@ Index: b/servconf.c
  	dump_cfg_fmtint(sEmptyPasswd, o->permit_empty_passwd);
  	dump_cfg_fmtint(sPermitUserEnvironment, o->permit_user_env);
  	dump_cfg_fmtint(sUseLogin, o->use_login);
-Index: b/servconf.h
-===================================================================
 --- a/servconf.h
 +++ b/servconf.h
-@@ -104,6 +104,7 @@
+@@ -108,6 +108,7 @@
  	int     challenge_response_authentication;
  	int     zero_knowledge_password_authentication;
  					/* If true, permit jpake auth */
@@ -529,8 +501,6 @@ Index: b/servconf.h
  	int     permit_empty_passwd;	/* If false, do not permit empty
  					 * passwords. */
  	int     permit_user_env;	/* If true, read ~/.ssh/environment */
-Index: b/ssh-add.1
-===================================================================
 --- a/ssh-add.1
 +++ b/ssh-add.1
 @@ -82,6 +82,10 @@
@@ -552,8 +522,6 @@ Index: b/ssh-add.1
  .Xr sshd 8
  .Sh AUTHORS
  OpenSSH is a derivative of the original and free
-Index: b/ssh-add.c
-===================================================================
 --- a/ssh-add.c
 +++ b/ssh-add.c
 @@ -139,7 +139,7 @@
@@ -580,8 +548,6 @@ Index: b/ssh-add.c
  
  	if (ssh_add_identity_constrained(ac, private, comment, lifetime,
  	    confirm)) {
-Index: b/ssh-keygen.1
-===================================================================
 --- a/ssh-keygen.1
 +++ b/ssh-keygen.1
 @@ -628,6 +628,7 @@
@@ -592,8 +558,6 @@ Index: b/ssh-keygen.1
  .Xr moduli 5 ,
  .Xr sshd 8
  .Rs
-Index: b/ssh-vulnkey.1
-===================================================================
 --- /dev/null
 +++ b/ssh-vulnkey.1
 @@ -0,0 +1,242 @@
@@ -839,8 +803,6 @@ Index: b/ssh-vulnkey.1
 +of processing
 +.Xr ssh-keyscan 1
 +output.
-Index: b/ssh-vulnkey.c
-===================================================================
 --- /dev/null
 +++ b/ssh-vulnkey.c
 @@ -0,0 +1,388 @@
@@ -1232,8 +1194,6 @@ Index: b/ssh-vulnkey.c
 +
 +	return ret;
 +}
-Index: b/ssh.1
-===================================================================
 --- a/ssh.1
 +++ b/ssh.1
 @@ -1426,6 +1426,7 @@
@@ -1244,8 +1204,6 @@ Index: b/ssh.1
  .Xr tun 4 ,
  .Xr hosts.equiv 5 ,
  .Xr ssh_config 5 ,
-Index: b/ssh.c
-===================================================================
 --- a/ssh.c
 +++ b/ssh.c
 @@ -1301,7 +1301,7 @@
@@ -1280,8 +1238,6 @@ Index: b/ssh.c
  		xfree(options.identity_files[i]);
  		identity_files[n_ids] = filename;
  		identity_keys[n_ids] = public;
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -1051,6 +1051,23 @@
@@ -1308,8 +1264,6 @@ Index: b/ssh_config.5
  .It Cm UsePrivilegedPort
  Specifies whether to use a privileged port for outgoing connections.
  The argument must be
-Index: b/sshconnect2.c
-===================================================================
 --- a/sshconnect2.c
 +++ b/sshconnect2.c
 @@ -1418,6 +1418,8 @@
@@ -1330,8 +1284,6 @@ Index: b/sshconnect2.c
  			debug("Trying private key: %s", id->filename);
  			id->key = load_identity_file(id->filename);
  			if (id->key != NULL) {
-Index: b/sshd.8
-===================================================================
 --- a/sshd.8
 +++ b/sshd.8
 @@ -928,6 +928,7 @@
@@ -1342,11 +1294,9 @@ Index: b/sshd.8
  .Xr chroot 2 ,
  .Xr hosts_access 5 ,
  .Xr login.conf 5 ,
-Index: b/sshd.c
-===================================================================
 --- a/sshd.c
 +++ b/sshd.c
-@@ -1564,6 +1564,11 @@
+@@ -1578,6 +1578,11 @@
  			sensitive_data.host_keys[i] = NULL;
  			continue;
  		}
@@ -1358,8 +1308,6 @@ Index: b/sshd.c
  		switch (key->type) {
  		case KEY_RSA1:
  			sensitive_data.ssh1_host_key = key;
-Index: b/sshd_config.5
-===================================================================
 --- a/sshd_config.5
 +++ b/sshd_config.5
 @@ -694,6 +694,20 @@

@@ -3,11 +3,9 @@ Author: Colin Watson <cjwatson@debian.org>
 Forwarded: not-needed
 Last-Updated: 2010-02-27
 
-Index: b/config.h.in
-===================================================================
 --- a/config.h.in
 +++ b/config.h.in
-@@ -1384,6 +1384,9 @@
+@@ -1387,6 +1387,9 @@
  /* Use btmp to log bad logins */
  #undef USE_BTMP
  
@@ -17,7 +15,7 @@ Index: b/config.h.in
  /* Use libedit for sftp */
  #undef USE_LIBEDIT
  
-@@ -1396,6 +1399,9 @@
+@@ -1399,6 +1402,9 @@
  /* Use PIPES instead of a socketpair() */
  #undef USE_PIPES
  

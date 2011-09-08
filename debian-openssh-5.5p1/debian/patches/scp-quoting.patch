@@ -7,8 +7,6 @@ Author: Nicolas Valcárcel <nvalcarcel@ubuntu.com>
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/89945
 Last-Update: 2010-02-27
 
-Index: b/scp.c
-===================================================================
 --- a/scp.c
 +++ b/scp.c
 @@ -168,8 +168,16 @@

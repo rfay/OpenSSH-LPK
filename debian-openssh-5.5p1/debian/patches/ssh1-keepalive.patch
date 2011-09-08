@@ -3,8 +3,6 @@ Author: Colin Watson <cjwatson@debian.org>
 Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1712
 Last-Update: 2010-02-27
 
-Index: b/clientloop.c
-===================================================================
 --- a/clientloop.c
 +++ b/clientloop.c
 @@ -507,16 +507,21 @@
@@ -14,13 +12,6 @@ Index: b/clientloop.c
 -	if (packet_inc_alive_timeouts() > options.server_alive_count_max) {
 -		logit("Timeout, server not responding.");
 -		cleanup_exit(255);
--	}
--	packet_start(SSH2_MSG_GLOBAL_REQUEST);
--	packet_put_cstring("keepalive@openssh.com");
--	packet_put_char(1);     /* boolean: want reply */
--	packet_send();
--	/* Insert an empty placeholder to maintain ordering */
--	client_register_global_confirm(NULL, NULL);
 +	if (compat20) {
 +		if (packet_inc_alive_timeouts() > options.server_alive_count_max) {
 +			logit("Timeout, server not responding.");
@@ -35,7 +26,13 @@ Index: b/clientloop.c
 +	} else {
 +		packet_send_ignore(0);
 +		packet_send();
-+	}
+ 	}
+-	packet_start(SSH2_MSG_GLOBAL_REQUEST);
+-	packet_put_cstring("keepalive@openssh.com");
+-	packet_put_char(1);     /* boolean: want reply */
+-	packet_send();
+-	/* Insert an empty placeholder to maintain ordering */
+-	client_register_global_confirm(NULL, NULL);
  }
  
  /*
@@ -48,8 +45,6 @@ Index: b/clientloop.c
  		tvp = NULL;
  	else {
  		tv.tv_sec = options.server_alive_interval;
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -952,7 +952,10 @@

@@ -6,11 +6,9 @@ Author: Colin Watson <cjwatson@debian.org>
 Forwarded: yes
 Last-Updated: 2010-03-01
 
-Index: b/servconf.c
-===================================================================
 --- a/servconf.c
 +++ b/servconf.c
-@@ -380,16 +380,20 @@
+@@ -438,16 +438,20 @@
  #ifdef GSSAPI
  	{ "gssapiauthentication", sGssAuthentication, SSHCFG_ALL },
  	{ "gssapicleanupcredentials", sGssCleanupCreds, SSHCFG_GLOBAL },

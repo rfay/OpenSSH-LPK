@@ -7,8 +7,6 @@ Author: Matthew Vernon <matthew@debian.org>
 Forwarded: not-needed
 Last-Update: 2010-02-28
 
-Index: b/sshconnect.c
-===================================================================
 --- a/sshconnect.c
 +++ b/sshconnect.c
 @@ -542,7 +542,7 @@
@@ -20,11 +18,9 @@ Index: b/sshconnect.c
  	if (roaming_atomicio(vwrite, connection_out, buf, strlen(buf))
  	    != strlen(buf))
  		fatal("write: %.100s", strerror(errno));
-Index: b/sshd.c
-===================================================================
 --- a/sshd.c
 +++ b/sshd.c
-@@ -422,7 +422,7 @@
+@@ -426,7 +426,7 @@
  		minor = PROTOCOL_MINOR_1;
  	}
  	snprintf(buf, sizeof buf, "SSH-%d.%d-%.100s%s", major, minor,
@@ -33,16 +29,14 @@ Index: b/sshd.c
  	server_version_string = xstrdup(buf);
  
  	/* Send our protocol version identification. */
-Index: b/version.h
-===================================================================
 --- a/version.h
 +++ b/version.h
-@@ -3,4 +3,9 @@
- #define SSH_VERSION	"OpenSSH_5.5"
+@@ -4,4 +4,9 @@
  
+ #define SSH_LPK		"lpk"
  #define SSH_PORTABLE	"p1"
--#define SSH_RELEASE	SSH_VERSION SSH_PORTABLE
-+#define SSH_RELEASE_MINIMUM	SSH_VERSION SSH_PORTABLE
+-#define SSH_RELEASE	SSH_VERSION SSH_PORTABLE SSH_LPK
++#define SSH_RELEASE_MINIMUM	SSH_VERSION SSH_PORTABLE SSH_LPK
 +#ifdef SSH_EXTRAVERSION
 +#define SSH_RELEASE	SSH_RELEASE_MINIMUM " " SSH_EXTRAVERSION
 +#else

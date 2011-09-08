@@ -8,8 +8,6 @@ Author: Colin Watson <cjwatson@debian.org>
 Forwarded: not-needed
 Last-Update: 2010-02-28
 
-Index: b/moduli.5
-===================================================================
 --- a/moduli.5
 +++ b/moduli.5
 @@ -21,7 +21,7 @@
@@ -30,8 +28,6 @@ Index: b/moduli.5
  that best meets the size requirement.
  .Pp
  .Sh SEE ALSO
-Index: b/ssh-keygen.1
-===================================================================
 --- a/ssh-keygen.1
 +++ b/ssh-keygen.1
 @@ -145,9 +145,7 @@
@@ -56,8 +52,6 @@ Index: b/ssh-keygen.1
  .It Fl R Ar hostname
  Removes all keys belonging to
  .Ar hostname
-Index: b/ssh.1
-===================================================================
 --- a/ssh.1
 +++ b/ssh.1
 @@ -762,6 +762,10 @@
@@ -71,8 +65,6 @@ Index: b/ssh.1
  contains a brief discussion of the two algorithms.
  .Pp
  The file
-Index: b/sshd.8
-===================================================================
 --- a/sshd.8
 +++ b/sshd.8
 @@ -70,7 +70,7 @@
@@ -101,8 +93,6 @@ Index: b/sshd.8
  .Xr moduli 5 ,
  .Xr sshd_config 5 ,
  .Xr inetd 8 ,
-Index: b/sshd_config.5
-===================================================================
 --- a/sshd_config.5
 +++ b/sshd_config.5
 @@ -177,8 +177,7 @@

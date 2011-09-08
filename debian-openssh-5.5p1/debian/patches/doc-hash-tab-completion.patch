@@ -4,8 +4,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1727
 Bug-Debian: http://bugs.debian.org/430154
 Last-Update: 2010-03-01
 
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -531,6 +531,9 @@

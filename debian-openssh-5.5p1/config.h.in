@@ -578,6 +578,9 @@
 /* Define to 1 if you have the <linux/if_tun.h> header file. */
 #undef HAVE_LINUX_IF_TUN_H
 
+/* Define if you want LDAP support */
+#undef WITH_LDAP_PUBKEY
+
 /* Define if your libraries define login() */
 #undef HAVE_LOGIN
 

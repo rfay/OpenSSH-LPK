@@ -11,8 +11,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1060
 Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=314347
 Last-Update: 2010-02-27
 
-Index: b/readconf.c
-===================================================================
 --- a/readconf.c
 +++ b/readconf.c
 @@ -28,6 +28,8 @@
@@ -34,8 +32,6 @@ Index: b/readconf.c
  			fatal("Bad owner or permissions on %s", filename);
  	}
  
-Index: b/ssh.1
-===================================================================
 --- a/ssh.1
 +++ b/ssh.1
 @@ -1324,6 +1324,8 @@
@@ -47,8 +43,6 @@ Index: b/ssh.1
  .Pp
  .It ~/.ssh/environment
  Contains additional definitions for environment variables; see
-Index: b/ssh_config.5
-===================================================================
 --- a/ssh_config.5
 +++ b/ssh_config.5
 @@ -1204,6 +1204,8 @@
@@ -60,8 +54,6 @@ Index: b/ssh_config.5
  .It Pa /etc/ssh/ssh_config
  Systemwide configuration file.
  This file provides defaults for those
-Index: b/auth.c
-===================================================================
 --- a/auth.c
 +++ b/auth.c
 @@ -385,8 +385,7 @@
@@ -94,8 +86,6 @@ Index: b/auth.c
  			snprintf(err, errlen,
  			    "bad ownership or modes for directory %s", buf);
  			return -1;
-Index: b/misc.c
-===================================================================
 --- a/misc.c
 +++ b/misc.c
 @@ -45,8 +45,9 @@
@@ -165,8 +155,6 @@ Index: b/misc.c
  tun_open(int tun, int mode)
  {
  #if defined(CUSTOM_SYS_TUN_OPEN)
-Index: b/misc.h
-===================================================================
 --- a/misc.h
 +++ b/misc.h
 @@ -91,4 +91,6 @@
@@ -176,8 +164,6 @@ Index: b/misc.h
 +int	 secure_permissions(struct stat *st, uid_t uid);
 +
  #endif /* _MISC_H */
-Index: b/auth-rhosts.c
-===================================================================
 --- a/auth-rhosts.c
 +++ b/auth-rhosts.c
 @@ -256,8 +256,7 @@

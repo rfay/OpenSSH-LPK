@@ -6,8 +6,6 @@ Bug-Debian: http://bugs.debian.org/226172
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/249706
 Last-Update: 2010-02-27
 
-Index: b/contrib/ssh-copy-id
-===================================================================
 --- a/contrib/ssh-copy-id
 +++ b/contrib/ssh-copy-id
 @@ -38,10 +38,10 @@

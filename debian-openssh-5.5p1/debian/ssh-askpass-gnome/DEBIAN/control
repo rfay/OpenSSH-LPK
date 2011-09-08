@@ -1,0 +1,18 @@
+Package: ssh-askpass-gnome
+Source: openssh
+Version: 1:5.5p1-6cg1
+Architecture: amd64
+Maintainer: Debian OpenSSH Maintainers <debian-ssh@lists.debian.org>
+Installed-Size: 180
+Depends: libc6 (>= 2.2.5), libglib2.0-0 (>= 2.12.0), libgtk2.0-0 (>= 2.8.0), libx11-6, openssh-client | ssh (>= 1:1.2pre7-4) | ssh-krb5
+Replaces: ssh (<< 1:3.5p1-3)
+Provides: ssh-askpass
+Section: gnome
+Priority: optional
+Homepage: http://www.openssh.org/
+Description: interactive X program to prompt users for a passphrase for ssh-add
+ This has been split out of the main openssh-client package so that
+ openssh-client does not need to depend on GTK+.
+ .
+ You probably want the ssh-askpass package instead, but this is
+ provided to add to your choice and/or confusion.

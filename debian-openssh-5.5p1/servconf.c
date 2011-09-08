@@ -42,6 +42,10 @@
 #include "channels.h"
 #include "groupaccess.h"
 
+#ifdef WITH_LDAP_PUBKEY
+#include "ldapauth.h"
+#endif
+
 static void add_listen_addr(ServerOptions *, char *, int);
 static void add_one_listen_addr(ServerOptions *, char *, int);
 
@@ -112,6 +116,25 @@ initialize_server_options(ServerOptions *options)
 	options->num_allow_groups = 0;
 	options->num_deny_groups = 0;
 	options->ciphers = NULL;
+#ifdef WITH_LDAP_PUBKEY
+	/* XXX dirty */
+	options->lpk.ld = NULL;
+	options->lpk.on = -1;
+	options->lpk.servers = NULL;
+	options->lpk.u_basedn = NULL;
+	options->lpk.g_basedn = NULL;
+	options->lpk.binddn = NULL;
+	options->lpk.bindpw = NULL;
+	options->lpk.sgroup = NULL;
+	options->lpk.filter = NULL;
+	options->lpk.fgroup = NULL;
+	options->lpk.l_conf = NULL;
+	options->lpk.tls = -1;
+	options->lpk.b_timeout.tv_sec = -1;
+	options->lpk.s_timeout.tv_sec = -1;
+	options->lpk.flags = FLAG_EMPTY;
+	options->lpk.pub_key_attr = NULL;
+#endif
 	options->macs = NULL;
 	options->protocol = SSH_PROTO_UNKNOWN;
 	options->gateway_ports = -1;
@@ -281,6 +304,35 @@ fill_default_server_options(ServerOptions *options)
 	if (options->debian_banner == -1)
 		options->debian_banner = 1;
 
+#ifdef WITH_LDAP_PUBKEY
+	if (options->lpk.on == -1)
+	    options->lpk.on = _DEFAULT_LPK_ON;
+	if (options->lpk.servers == NULL)
+	    options->lpk.servers = _DEFAULT_LPK_SERVERS;
+	if (options->lpk.u_basedn == NULL)
+	    options->lpk.u_basedn = _DEFAULT_LPK_UDN;
+	if (options->lpk.g_basedn == NULL)
+	    options->lpk.g_basedn = _DEFAULT_LPK_GDN;
+	if (options->lpk.binddn == NULL)
+	    options->lpk.binddn = _DEFAULT_LPK_BINDDN;
+	if (options->lpk.bindpw == NULL)
+	    options->lpk.bindpw = _DEFAULT_LPK_BINDPW;
+	if (options->lpk.sgroup == NULL)
+	    options->lpk.sgroup = _DEFAULT_LPK_SGROUP;
+	if (options->lpk.filter == NULL)
+	    options->lpk.filter = _DEFAULT_LPK_FILTER;
+	if (options->lpk.tls == -1)
+	    options->lpk.tls = _DEFAULT_LPK_TLS;
+	if (options->lpk.b_timeout.tv_sec == -1)
+	    options->lpk.b_timeout.tv_sec = _DEFAULT_LPK_BTIMEOUT;
+	if (options->lpk.s_timeout.tv_sec == -1)
+	    options->lpk.s_timeout.tv_sec = _DEFAULT_LPK_STIMEOUT;
+	if (options->lpk.l_conf == NULL)
+	    options->lpk.l_conf = _DEFAULT_LPK_LDP;
+	if (options->lpk.pub_key_attr == NULL)
+	    options->lpk.pub_key_attr = _DEFAULT_LPK_PUB;
+#endif
+
 	/* Turn privilege separation on by default */
 	if (use_privsep == -1)
 		use_privsep = 1;
@@ -330,6 +382,12 @@ typedef enum {
 	sRevokedKeys, sTrustedUserCAKeys,
 	sDebianBanner,
 	sDeprecated, sUnsupported
+#ifdef WITH_LDAP_PUBKEY
+	,sLdapPublickey, sLdapServers, sLdapUserDN
+	,sLdapGroupDN, sBindDN, sBindPw, sMyGroup
+	,sLdapFilter, sForceTLS, sBindTimeout
+	,sSearchTimeout, sLdapConf ,sLpkPubKeyAttr 
+#endif
 } ServerOpCodes;
 
 #define SSHCFG_GLOBAL	0x01	/* allowed in main section of sshd_config */
@@ -451,6 +509,22 @@ static struct {
 	{ "clientalivecountmax", sClientAliveCountMax, SSHCFG_GLOBAL },
 	{ "authorizedkeysfile", sAuthorizedKeysFile, SSHCFG_GLOBAL },
 	{ "authorizedkeysfile2", sAuthorizedKeysFile2, SSHCFG_GLOBAL },
+#ifdef WITH_LDAP_PUBKEY
+	{ _DEFAULT_LPK_TOKEN, sLdapPublickey, SSHCFG_GLOBAL },
+	{ _DEFAULT_SRV_TOKEN, sLdapServers, SSHCFG_GLOBAL },
+	{ _DEFAULT_USR_TOKEN, sLdapUserDN, SSHCFG_GLOBAL },
+	{ _DEFAULT_GRP_TOKEN, sLdapGroupDN, SSHCFG_GLOBAL },
+	{ _DEFAULT_BDN_TOKEN, sBindDN, SSHCFG_GLOBAL },
+	{ _DEFAULT_BPW_TOKEN, sBindPw, SSHCFG_GLOBAL },
+	{ _DEFAULT_MYG_TOKEN, sMyGroup, SSHCFG_GLOBAL },
+	{ _DEFAULT_FIL_TOKEN, sLdapFilter, SSHCFG_GLOBAL },
+	{ _DEFAULT_TLS_TOKEN, sForceTLS, SSHCFG_GLOBAL },
+	{ _DEFAULT_BTI_TOKEN, sBindTimeout, SSHCFG_GLOBAL },
+	{ _DEFAULT_STI_TOKEN, sSearchTimeout, SSHCFG_GLOBAL },
+	{ _DEFAULT_LDP_TOKEN, sLdapConf, SSHCFG_GLOBAL },
+	{ "LpkPubKeyAttr", sLpkPubKeyAttr, SSHCFG_GLOBAL },
+#endif
+
 	{ "useprivilegeseparation", sUsePrivilegeSeparation, SSHCFG_GLOBAL},
 	{ "acceptenv", sAcceptEnv, SSHCFG_GLOBAL },
 	{ "permittunnel", sPermitTunnel, SSHCFG_GLOBAL },
@@ -694,6 +768,7 @@ process_server_config_line(ServerOptions *options, char *line,
 	int cmdline = 0, *intptr, value, n;
 	SyslogFacility *log_facility_ptr;
 	LogLevel *log_level_ptr;
+ 	unsigned long lvalue, *longptr;
 	ServerOpCodes opcode;
 	int port;
 	u_int i, flags = 0;
@@ -708,6 +783,7 @@ process_server_config_line(ServerOptions *options, char *line,
 	if (!arg || !*arg || *arg == '#')
 		return 0;
 	intptr = NULL;
+	longptr = NULL;
 	charptr = NULL;
 	opcode = parse_token(arg, filename, linenum, &flags);
 
@@ -1408,6 +1484,125 @@ process_server_config_line(ServerOptions *options, char *line,
 		while (arg)
 		    arg = strdelim(&cp);
 		break;
+#ifdef WITH_LDAP_PUBKEY
+	case sLdapPublickey:
+		intptr = &options->lpk.on;
+		goto parse_flag;
+	case sLdapServers:
+		/* arg = strdelim(&cp); */
+		p = line;
+		while(*p++);
+		arg = p;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing ldap server",filename,linenum);
+		arg[strlen(arg)] = '\0';
+		if ((options->lpk.servers = ldap_parse_servers(arg)) == NULL)
+		    fatal("%s line %d: error in ldap servers", filename, linenum);
+		memset(arg,0,strlen(arg));
+		break;
+	case sLdapUserDN:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing ldap server",filename,linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.u_basedn = xstrdup(arg);
+		memset(arg,0,strlen(arg));
+		break;
+	case sLdapGroupDN:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing ldap server",filename,linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.g_basedn = xstrdup(arg);
+		memset(arg,0,strlen(arg));
+		break;
+	case sBindDN:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing binddn",filename,linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.binddn = xstrdup(arg);
+		memset(arg,0,strlen(arg));
+		break;
+	case sBindPw:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing bindpw",filename,linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.bindpw = xstrdup(arg);
+		memset(arg,0,strlen(arg));
+		break;
+	case sMyGroup:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing groupname",filename, linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.sgroup = xstrdup(arg);
+		if (options->lpk.sgroup)
+		    options->lpk.fgroup = ldap_parse_groups(options->lpk.sgroup);
+		memset(arg,0,strlen(arg));
+		break;
+	case sLdapFilter:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing filter",filename, linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.filter = xstrdup(arg);
+		memset(arg,0,strlen(arg));
+		break;
+	case sForceTLS:
+		intptr = &options->lpk.tls;
+		arg = strdelim(&cp);
+		if (!arg || *arg == '\0')
+			fatal("%s line %d: missing yes/no argument.",
+			    filename, linenum);
+		value = 0;	/* silence compiler */
+		if (strcmp(arg, "yes") == 0)
+			value = 1;
+		else if (strcmp(arg, "no") == 0)
+			value = 0;
+		else if (strcmp(arg, "try") == 0)
+			value = -1;
+		else
+			fatal("%s line %d: Bad yes/no argument: %s",
+				filename, linenum, arg);
+		if (*intptr == -1)
+			*intptr = value;
+		break;
+	case sBindTimeout:
+		longptr = (unsigned long *) &options->lpk.b_timeout.tv_sec;
+parse_ulong:
+		arg = strdelim(&cp);
+		if (!arg || *arg == '\0')
+			fatal("%s line %d: missing integer value.",
+			    filename, linenum);
+		lvalue = atol(arg);
+		if (*activep && *longptr == -1)
+			*longptr = lvalue;
+		break;
+
+	case sSearchTimeout:
+		longptr = (unsigned long *) &options->lpk.s_timeout.tv_sec;
+		goto parse_ulong;
+		break;
+	case sLdapConf:
+		arg = cp;
+		if (!arg || *arg == '\0')
+		    fatal("%s line %d: missing LpkLdapConf", filename, linenum);
+		arg[strlen(arg)] = '\0';
+		options->lpk.l_conf = xstrdup(arg);
+		memset(arg, 0, strlen(arg));
+		break;
+	case sLpkPubKeyAttr:
+		arg = cp;
+                if (!arg || *arg == '\0')
+                    fatal("%s line %d: missing pubkeyattr",filename,linenum);
+                arg[strlen(arg)] = '\0';
+                options->lpk.pub_key_attr = xstrdup(arg);
+                memset(arg,0,strlen(arg));
+                break;
+
+#endif
 
 	default:
 		fatal("%s line %d: Missing handler for opcode %s (%d)",

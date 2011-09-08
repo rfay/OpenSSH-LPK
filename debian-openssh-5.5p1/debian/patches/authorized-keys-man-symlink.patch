@@ -4,8 +4,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1720
 Bug-Debian: http://bugs.debian.org/441817
 Last-Update: 2010-03-01
 
-Index: b/Makefile.in
-===================================================================
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -284,6 +284,7 @@

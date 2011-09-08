@@ -1,4 +1,5 @@
 # GSSAPI
+contrib-openssh-lpk-5.5p1-0.3.13.patch
 gssapi.patch
 gssapi-autoconf.patch
 gssapi-compat.patch
@@ -42,3 +43,4 @@ doc-hash-tab-completion.patch
 # Debian-specific configuration
 gnome-ssh-askpass2-icon.patch
 debian-config.patch
+lpk-makefile.patch

@@ -1,0 +1,14 @@
+Package: ssh
+Source: openssh
+Version: 1:5.5p1-6cg1
+Architecture: all
+Maintainer: Debian OpenSSH Maintainers <debian-ssh@lists.debian.org>
+Installed-Size: 40
+Depends: openssh-client, openssh-server
+Section: net
+Priority: extra
+Homepage: http://www.openssh.org/
+Description: secure shell client and server (metapackage)
+ This metapackage is a convenient way to install both the OpenSSH client
+ and the OpenSSH server. It provides nothing in and of itself, so you
+ may remove it if nothing depends on it.

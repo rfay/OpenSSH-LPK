@@ -1,0 +1,2 @@
+misc:Depends=debconf (>= 0.5) | debconf-2.0
+shlibs:Depends=libc6 (>= 2.11), libedit2 (>= 2.11-20080614-1), libgssapi-krb5-2 (>= 1.7+dfsg), libldap-2.4-2 (>= 2.4.7), libssl0.9.8 (>= 0.9.8m-1), zlib1g (>= 1:1.1.4)

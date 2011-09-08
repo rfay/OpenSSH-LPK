@@ -12,8 +12,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1118
 Bug-Debian: http://bugs.debian.org/313371
 Last-Update: 2010-02-27
 
-Index: b/clientloop.c
-===================================================================
 --- a/clientloop.c
 +++ b/clientloop.c
 @@ -1530,8 +1530,10 @@

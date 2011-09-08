@@ -1370,6 +1370,37 @@ AC_ARG_WITH(audit,
 	esac ]
 )
 
+# Check whether user wants LDAP support
+LDAP_MSG="no"
+AC_ARG_WITH(ldap,
+	[  --with-ldap[[=PATH]]      Enable LDAP pubkey support (optionally in PATH)],
+	[
+		if test "x$withval" != "xno" ; then
+
+			if test "x$withval" != "xyes" ; then
+				CPPFLAGS="$CPPFLAGS -I${withval}/include"
+				LDFLAGS="$LDFLAGS -L${withval}/lib"
+			fi
+
+			AC_DEFINE([WITH_LDAP_PUBKEY], 1, [Enable LDAP pubkey support])
+			LIBS="-lldap $LIBS"
+			LDAP_MSG="yes"
+	
+			AC_MSG_CHECKING([for LDAP support])
+			AC_TRY_COMPILE(
+				[#include <sys/types.h>
+				 #include <ldap.h>],
+				[(void)ldap_init(0, 0);],
+				[AC_MSG_RESULT(yes)],
+				[
+				    AC_MSG_RESULT(no) 
+					AC_MSG_ERROR([** Incomplete or missing ldap libraries **])
+				]
+        	)
+		fi
+	]
+)
+
 dnl    Checks for library functions. Please keep in alphabetical order
 AC_CHECK_FUNCS( \
 	arc4random \
@@ -4205,6 +4236,7 @@ echo "                   SELinux support: $SELINUX_MSG"
 echo "                 Smartcard support: $SCARD_MSG"
 echo "                     S/KEY support: $SKEY_MSG"
 echo "              TCP Wrappers support: $TCPW_MSG"
+echo "                      LDAP support: $LDAP_MSG"
 echo "              MD5 password support: $MD5_MSG"
 echo "                   libedit support: $LIBEDIT_MSG"
 echo "  Solaris process contract support: $SPC_MSG"

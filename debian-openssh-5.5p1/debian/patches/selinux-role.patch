@@ -7,8 +7,6 @@ Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1641
 Bug-Debian: http://bugs.debian.org/394795
 Last-Update: 2010-02-27
 
-Index: b/auth.h
-===================================================================
 --- a/auth.h
 +++ b/auth.h
 @@ -59,6 +59,7 @@
@@ -19,8 +17,6 @@ Index: b/auth.h
  	void		*kbdintctxt;
  	void		*jpake_ctx;
  #ifdef BSD_AUTH
-Index: b/auth1.c
-===================================================================
 --- a/auth1.c
 +++ b/auth1.c
 @@ -383,7 +383,7 @@
@@ -50,8 +46,6 @@ Index: b/auth1.c
  
  	/* Verify that the user is a valid user. */
  	if ((authctxt->pw = PRIVSEP(getpwnamallow(user))) != NULL)
-Index: b/auth2.c
-===================================================================
 --- a/auth2.c
 +++ b/auth2.c
 @@ -217,7 +217,7 @@
@@ -88,8 +82,6 @@ Index: b/auth2.c
  		userauth_banner();
  	} else if (strcmp(user, authctxt->user) != 0 ||
  	    strcmp(service, authctxt->service) != 0) {
-Index: b/monitor.c
-===================================================================
 --- a/monitor.c
 +++ b/monitor.c
 @@ -137,6 +137,7 @@
@@ -156,8 +148,6 @@ Index: b/monitor.c
  	return (0);
  }
  
-Index: b/monitor.h
-===================================================================
 --- a/monitor.h
 +++ b/monitor.h
 @@ -30,7 +30,7 @@
@@ -169,8 +159,6 @@ Index: b/monitor.h
  	MONITOR_REQ_SIGN, MONITOR_ANS_SIGN,
  	MONITOR_REQ_PWNAM, MONITOR_ANS_PWNAM,
  	MONITOR_REQ_AUTH2_READ_BANNER, MONITOR_ANS_AUTH2_READ_BANNER,
-Index: b/monitor_wrap.c
-===================================================================
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
 @@ -279,10 +279,10 @@
@@ -186,7 +174,7 @@ Index: b/monitor_wrap.c
  {
  	Buffer m;
  
-@@ -291,12 +291,30 @@
+@@ -291,11 +291,29 @@
  	buffer_init(&m);
  	buffer_put_cstring(&m, service);
  	buffer_put_cstring(&m, style ? style : "");
@@ -196,7 +184,7 @@ Index: b/monitor_wrap.c
  
  	buffer_free(&m);
  }
- 
++
 +/* Inform the privileged process about role */
 +
 +void
@@ -213,12 +201,9 @@ Index: b/monitor_wrap.c
 +
 +	buffer_free(&m);
 +}
-+
+ 
  /* Do the password authentication */
  int
- mm_auth_password(Authctxt *authctxt, char *password)
-Index: b/monitor_wrap.h
-===================================================================
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
 @@ -40,7 +40,8 @@
@@ -231,8 +216,6 @@ Index: b/monitor_wrap.h
  struct passwd *mm_getpwnamallow(const char *);
  char *mm_auth2_read_banner(void);
  int mm_auth_password(struct Authctxt *, char *);
-Index: b/openbsd-compat/port-linux.c
-===================================================================
 --- a/openbsd-compat/port-linux.c
 +++ b/openbsd-compat/port-linux.c
 @@ -29,6 +29,12 @@

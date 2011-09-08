@@ -131,6 +131,10 @@ int allow_severity;
 int deny_severity;
 #endif /* LIBWRAP */
 
+#ifdef WITH_LDAP_PUBKEY
+#include "ldapauth.h"
+#endif
+
 #ifndef O_NOCTTY
 #define O_NOCTTY	0
 #endif
@@ -1535,6 +1539,16 @@ main(int ac, char **av)
 		exit(1);
 	}
 
+#ifdef WITH_LDAP_PUBKEY
+    /* ldap_options_print(&options.lpk); */
+    /* XXX initialize/check ldap connection and set *LD */
+    if (options.lpk.on) {
+        if (options.lpk.l_conf && (ldap_parse_lconf(&options.lpk) < 0) )
+            error("[LDAP] could not parse %s", options.lpk.l_conf);
+        if (ldap_connect(&options.lpk) < 0)
+            error("[LDAP] could not initialize ldap connection");
+    }
+#endif
 	debug("sshd version %.100s", SSH_RELEASE);
 
 	/* Store privilege separation user for later use if required. */

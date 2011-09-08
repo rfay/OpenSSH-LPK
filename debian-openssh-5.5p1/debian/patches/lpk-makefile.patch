@@ -1,0 +1,20 @@
+Index: openssh-5.5p1/debian/rules
+===================================================================
+--- openssh-5.5p1.orig/debian/rules	2011-09-06 18:46:23.000000000 -0600
++++ openssh-5.5p1/debian/rules	2011-09-06 19:13:17.000000000 -0600
+@@ -106,13 +106,14 @@
+ cflags := $(OPTFLAGS) $(PIC_CFLAGS) $(HARDENING_CFLAGS)
+ cflags += -DLOGIN_PROGRAM=\"/bin/login\" -DLOGIN_NO_ENDOPT
+ cflags += -DSSH_EXTRAVERSION=\"$(SSH_EXTRAVERSION)\"
++cflags += -DWITH_LDAP_PUBKEY 
+ cflags_udeb := -Os
+ cflags_udeb += -DSSH_EXTRAVERSION=\"$(SSH_EXTRAVERSION)\"
+ confflags += --with-cflags='$(cflags)'
+ confflags_udeb += --with-cflags='$(cflags_udeb)'
+ 
+ # Linker flags.
+-confflags += --with-ldflags='$(strip -Wl,--as-needed $(PIC_LDFLAGS) $(HARDENING_LDFLAGS))'
++confflags += --with-ldflags='-L/usr/lib -lldap $(strip -Wl,--as-needed $(PIC_LDFLAGS) $(HARDENING_LDFLAGS))'
+ confflags_udeb += --with-ldflags='-Wl,--as-needed'
+ 
+ %:

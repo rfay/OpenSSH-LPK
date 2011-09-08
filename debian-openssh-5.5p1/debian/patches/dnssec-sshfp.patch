@@ -5,8 +5,6 @@ Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=572049
 Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=572049
 Last-Update: 2010-04-06
 
-Index: b/dns.c
-===================================================================
 --- a/dns.c
 +++ b/dns.c
 @@ -176,6 +176,7 @@
@@ -38,8 +36,6 @@ Index: b/dns.c
  	if (result) {
  		verbose("DNS lookup error: %s", dns_result_totext(result));
  		return -1;
-Index: b/openbsd-compat/getrrsetbyname.c
-===================================================================
 --- a/openbsd-compat/getrrsetbyname.c
 +++ b/openbsd-compat/getrrsetbyname.c
 @@ -209,8 +209,8 @@
@@ -66,8 +62,6 @@ Index: b/openbsd-compat/getrrsetbyname.c
  #endif /* RES_USE_DNSEC */
  
  	/* make query */
-Index: b/openbsd-compat/getrrsetbyname.h
-===================================================================
 --- a/openbsd-compat/getrrsetbyname.h
 +++ b/openbsd-compat/getrrsetbyname.h
 @@ -72,6 +72,9 @@
