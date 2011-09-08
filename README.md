@@ -1,5 +1,46 @@
-This is just an attempt to organize resources for an Openssh 5.5p1 OpenSSH LPK patch for a Debian Squeeze package.
+This repo gathers together the resources for OpenSSH 5.5p1 OpenSSH LPK
+build for Debian Squeeze package.
 
+The build area is in debian-openssh-5.5p1; You can build there with
+
+    # Install some required packages
+    apt-get install libssl-dev libpam0g-dev libgtk2.0-dev libedit-dev libkrb5-dev libwrap0-dev quilt libselinux1-dev libldap2-dev
+    cd debian-openssh-5.5p1
+    dpkg-buildpackage -rfakeroot -b -uc -us
+
+
+What I did to create this:
+
+1. apt-get source openssh
+2. Altered the version.h patch in debian/patches
+3. Using dquilt to add the openssh-lpk patch
+    apt-get source openssh
+    cd openssh-5.5p1
+    dquilt pop -a  # so that we can apply the LPK patch first
+    dquilt import contrib-openssh-lpk-5.5p1-0.3.13.patch  
+    dquilt push
+    dquilt refresh
+    dquilt header -e
+
+    while dquilt push
+    do
+      dquilt refresh
+    done
+4. Added the lpk-makefile.patch which changes debian/rules to use appropriate CFLAGS and LDFLAGS
+   dquilt import lpk-makefile.patch
+   dquilt push
+   dquilt refresh
+
+
+Although this seemed enormously difficult just getting through all the debian technology, it seems that the only actual work to be done was:
+
+* Add the patch to the patch list
+* Fix the versions patch
+* Add the rules patch (lpk-makefile) so that the proper options and libraries were mentioned
+
+
+--------------
+Original Notes:
 Here are some resources:
 
 * [Patching with LPK and HPN](http://zecrazytux.net/articles/Sysadmin/OpenSSH_LPK+HPN.html) (Quite dated, and it doesn't actually work out.
