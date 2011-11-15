@@ -13,25 +13,30 @@ The build area is in debian-openssh-5.5p1; You can build there with
 
 What I did to create this:
 
-1. apt-get source openssh
-2. Altered the version.h patch in debian/patches
-3. Using dquilt to add the openssh-lpk patch
-    apt-get source openssh
-    cd openssh-5.5p1
-    dquilt pop -a  # so that we can apply the LPK patch first
-    dquilt import contrib-openssh-lpk-5.5p1-0.3.13.patch  
+apt-get source openssh
+
+Altered the version.h patch in debian/patches
+
+Using dquilt to add the openssh-lpk patch
+
+      apt-get source openssh
+      cd openssh-5.5p1
+      dquilt pop -a  # so that we can apply the LPK patch first
+      dquilt import contrib-openssh-lpk-5.5p1-0.3.13.patch  
+      dquilt push
+      dquilt refresh
+      dquilt header -e
+    
+      while dquilt push
+      do
+        dquilt refresh
+      done
+    
+Added the lpk-makefile.patch which changes debian/rules to use appropriate CFLAGS and LDFLAGS
+
+    dquilt import lpk-makefile.patch
     dquilt push
     dquilt refresh
-    dquilt header -e
-
-    while dquilt push
-    do
-      dquilt refresh
-    done
-4. Added the lpk-makefile.patch which changes debian/rules to use appropriate CFLAGS and LDFLAGS
-   dquilt import lpk-makefile.patch
-   dquilt push
-   dquilt refresh
 
 
 Although this seemed enormously difficult just getting through all the debian technology, it seems that the only actual work to be done was:
