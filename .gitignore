@@ -1,8 +1,0 @@
-debian-openssh-5.5p1/debian/tmp
-debian-openssh-5.5p1/debian/build-udeb
-debian-openssh-5.5p1/debian/build-deb
-debian-openssh-5.5p1/build-deb/
-debian-openssh-5.5p1/build-udeb/
-*.deb
-*.udeb
-*.changes
