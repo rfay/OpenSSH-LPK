@@ -2,6 +2,7 @@ This directory contains the patches necessary to build OpenSSH-LPK packages
 for Debian Squeeze.
 
 64-bit packages are available at apt.c--g.net 
+
       deb http://apt.c--g.net/ squeeze main cg
 
 The pubkey is commerceguys.public.key
