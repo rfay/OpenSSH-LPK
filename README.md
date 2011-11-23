@@ -6,7 +6,7 @@ for Debian Squeeze.
 
 The pubkey is commerceguys.public.key
 
-      wget -O - https://github.com/rfay/OpenSSH-LPK/blob/master/commerceguys.public.key | apt-key add -
+      wget -O - https://github.com/rfay/OpenSSH-LPK/raw/master/commerceguys.public.key | apt-key add -
 
 ## Setup
 
