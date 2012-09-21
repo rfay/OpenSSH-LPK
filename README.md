@@ -1,6 +1,9 @@
 This directory contains the patches necessary to build OpenSSH-LPK packages
 for Debian Squeeze.
 
+You will probably also be interested in [Marc Wäckerlin's maintained packages for Debian and Ubuntu](http://marc.xn--wckerlin-0za.ch/computer/blog/ssh_and_ldap)
+which are perhaps more actively maintained. Note that I'm happy to grant maintainership to this repository to anybody actively using OpenSSH-LPK.
+
 64-bit packages are available at apt.c--g.net 
 
       deb http://apt.c--g.net/ squeeze main cg
