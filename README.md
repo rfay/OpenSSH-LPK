@@ -15,7 +15,7 @@ The pubkey is commerceguys.public.key
 ## Setup
 
     # Install some required packages
-    apt-get install libssl-dev libpam0g-dev libgtk2.0-dev libedit-dev libkrb5-dev libwrap0-dev quilt libselinux1-dev libldap2-dev
+    apt-get install libssl-dev libpam0g-dev libgtk2.0-dev libedit-dev libkrb5-dev libwrap0-dev quilt libselinux1-dev libldap2-dev hardening-includes
     # Configure [dquilt](http://www.debian.org/doc/manuals/maint-guide/modify.en.html#quiltrc) by adding to your .bashrc:
     alias dquilt="quilt --quiltrc=${HOME}/.quiltrc-dpkg" 
 
